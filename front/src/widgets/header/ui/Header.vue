@@ -19,9 +19,9 @@ async function handleLogout() {
 <template>
   <header class="sticky top-0 z-40 hidden border-b border-border bg-card/80 backdrop-blur-sm md:block">
     <div class="container mx-auto flex h-16 items-center justify-between px-4">
-      <span class="text-2xl font-bold text-primary">
-        Семейные рецепты
-      </span>
+      <RouterLink to="/" class="text-2xl font-bold text-primary">
+        Obedi
+      </RouterLink>
 
       <nav class="flex items-center gap-4">
         <RouterLink

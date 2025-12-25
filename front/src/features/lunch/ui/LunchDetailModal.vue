@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import { computed, ref, watch } from 'vue'
+import { marked } from 'marked'
 import { useLunch, useDeleteLunch, useUploadLunchImage, useDeleteLunchImage, useUpdateLunch, useUser } from '@shared/api'
 import { useModalStore } from '@widgets/modal-container'
 import { useSessionStore } from '@entities/session'
@@ -33,7 +34,9 @@ const editForm = ref({
   fats: null as number | null,
   carbs: null as number | null,
   cookingTime: null as number | null,
+  tags: [] as string[],
 })
+const newTag = ref('')
 
 // Sync form with lunch data when entering edit mode
 watch(isEditMode, (editing) => {
@@ -47,7 +50,9 @@ watch(isEditMode, (editing) => {
       fats: lunch.value.fats,
       carbs: lunch.value.carbs,
       cookingTime: lunch.value.cookingTime,
+      tags: [...(lunch.value.tags || [])],
     }
+    newTag.value = ''
   }
 })
 
@@ -74,6 +79,17 @@ const difficultyLabels = {
   MEDIUM: 'Средне',
   HARD: 'Сложно',
 }
+
+// Configure marked for safe rendering
+marked.setOptions({
+  breaks: true,
+  gfm: true,
+})
+
+const renderedRecipe = computed(() => {
+  if (!lunch.value?.recipe) return ''
+  return marked(lunch.value.recipe) as string
+})
 
 async function handleDelete() {
   if (!confirm('Удалить этот обед?')) return
@@ -114,6 +130,18 @@ async function handleDeleteImage(imageId: number) {
   }
 }
 
+function addTag() {
+  const tag = newTag.value.trim()
+  if (tag && !editForm.value.tags.includes(tag)) {
+    editForm.value.tags.push(tag)
+  }
+  newTag.value = ''
+}
+
+function removeTag(tag: string) {
+  editForm.value.tags = editForm.value.tags.filter(t => t !== tag)
+}
+
 async function handleSave() {
   try {
     await updateLunch.mutateAsync({
@@ -127,6 +155,7 @@ async function handleSave() {
         fats: editForm.value.fats ?? undefined,
         carbs: editForm.value.carbs ?? undefined,
         cookingTime: editForm.value.cookingTime ?? undefined,
+        tags: editForm.value.tags,
       },
     })
     isEditMode.value = false
@@ -284,14 +313,52 @@ async function handleSave() {
         </button>
       </div>
 
-      <div v-if="lunch.tags.length" class="mb-4 flex flex-wrap gap-2">
-        <span
-          v-for="tag in lunch.tags"
-          :key="tag"
-          class="rounded-full bg-primary/10 px-3 py-1 text-sm text-primary"
-        >
-          {{ tag }}
-        </span>
+      <div v-if="isEditMode || lunch.tags.length" class="mb-4">
+        <div class="flex flex-wrap gap-2">
+          <template v-if="isEditMode">
+            <span
+              v-for="tag in editForm.tags"
+              :key="tag"
+              class="group flex items-center gap-1 rounded-full bg-primary/10 px-3 py-1 text-sm text-primary"
+            >
+              {{ tag }}
+              <button
+                type="button"
+                class="ml-1 rounded-full p-0.5 transition-colors hover:bg-primary/20"
+                @click="removeTag(tag)"
+              >
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-3 w-3" viewBox="0 0 20 20" fill="currentColor">
+                  <path fill-rule="evenodd" d="M4.293 4.293a1 1 0 011.414 0L10 8.586l4.293-4.293a1 1 0 111.414 1.414L11.414 10l4.293 4.293a1 1 0 01-1.414 1.414L10 11.414l-4.293 4.293a1 1 0 01-1.414-1.414L8.586 10 4.293 5.707a1 1 0 010-1.414z" clip-rule="evenodd" />
+                </svg>
+              </button>
+            </span>
+          </template>
+          <template v-else>
+            <span
+              v-for="tag in lunch.tags"
+              :key="tag"
+              class="rounded-full bg-primary/10 px-3 py-1 text-sm text-primary"
+            >
+              {{ tag }}
+            </span>
+          </template>
+        </div>
+        <div v-if="isEditMode" class="mt-2 flex gap-2">
+          <input
+            v-model="newTag"
+            type="text"
+            class="flex-1 rounded-lg border border-border bg-background px-3 py-2 text-sm focus:border-primary focus:outline-none"
+            placeholder="Новый тег..."
+            @keydown.enter.prevent="addTag"
+          />
+          <button
+            type="button"
+            class="rounded-lg bg-secondary px-3 py-2 text-sm font-medium transition-colors hover:bg-secondary/80"
+            @click="addTag"
+          >
+            Добавить
+          </button>
+        </div>
       </div>
 
       <div v-if="isEditMode || lunch.calories || lunch.proteins || lunch.fats || lunch.carbs || lunch.cookingTime" class="mb-6 grid grid-cols-2 gap-4 rounded-xl bg-secondary/50 p-4 sm:grid-cols-5">
@@ -364,9 +431,9 @@ async function handleSave() {
           v-model="editForm.recipe"
           rows="8"
           class="w-full rounded-lg border border-border bg-background px-3 py-2 text-foreground focus:border-primary focus:outline-none"
-          placeholder="Опишите рецепт..."
+          placeholder="Опишите рецепт... (поддерживается Markdown)"
         />
-        <div v-else class="whitespace-pre-wrap text-muted-foreground">{{ lunch.recipe }}</div>
+        <div v-else class="recipe-content text-muted-foreground" v-html="renderedRecipe" />
       </div>
 
       <div v-if="!isEditMode && !isOwner" class="mt-6 border-t border-border pt-4">
@@ -436,5 +503,33 @@ async function handleSave() {
 .fade-enter-from,
 .fade-leave-to {
   opacity: 0;
+}
+
+.recipe-content :deep(p) {
+  margin-bottom: 0.75rem;
+}
+.recipe-content :deep(ul),
+.recipe-content :deep(ol) {
+  margin-left: 1.25rem;
+  margin-bottom: 0.75rem;
+}
+.recipe-content :deep(ul) {
+  list-style-type: disc;
+}
+.recipe-content :deep(ol) {
+  list-style-type: decimal;
+}
+.recipe-content :deep(li) {
+  margin-bottom: 0.25rem;
+}
+.recipe-content :deep(strong) {
+  font-weight: 600;
+}
+.recipe-content :deep(h1),
+.recipe-content :deep(h2),
+.recipe-content :deep(h3) {
+  font-weight: 600;
+  margin-top: 1rem;
+  margin-bottom: 0.5rem;
 }
 </style>

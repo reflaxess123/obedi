@@ -68,6 +68,14 @@ export class LunchesService {
       data: {
         userId,
         title: dto.title || 'Новый обед',
+        recipe: dto.recipe,
+        calories: dto.calories,
+        proteins: dto.proteins,
+        fats: dto.fats,
+        carbs: dto.carbs,
+        cookingTime: dto.cookingTime,
+        difficulty: dto.difficulty,
+        tags: dto.tags || [],
       },
       include: { images: true },
     });
