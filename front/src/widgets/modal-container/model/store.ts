@@ -1,6 +1,13 @@
 import { defineStore } from 'pinia'
 import { ref, computed, type Component, markRaw } from 'vue'
 
+function generateId(): string {
+  if (typeof crypto !== 'undefined' && crypto.randomUUID) {
+    return crypto.randomUUID()
+  }
+  return `${Date.now()}-${Math.random().toString(36).slice(2, 11)}`
+}
+
 export interface ModalConfig {
   id: string
   component: Component
@@ -15,7 +22,7 @@ export const useModalStore = defineStore('modal', () => {
   const currentModal = computed(() => stack.value[stack.value.length - 1] || null)
 
   function open(config: Omit<ModalConfig, 'id'>) {
-    const id = crypto.randomUUID()
+    const id = generateId()
     stack.value.push({
       id,
       component: markRaw(config.component),

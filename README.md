@@ -15,11 +15,12 @@ pnpm dev
 
 ## Test Accounts
 
-| Email | Password |
-|-------|----------|
-| demo@example.com | password123 |
-| chef@example.com | password123 |
-| foodie@example.com | password123 |
+| Email | Password | Описание |
+|-------|----------|----------|
+| vadim@example.com | 123123 | Вадим |
+| anastasia@example.com | 123123 | Анастасия (семейные рецепты) |
+| chef@example.com | password123 | Шеф-повар Иван |
+| foodie@example.com | password123 | Гурман Анна |
 
 ## Stack
 
