@@ -29,7 +29,7 @@ services:
         COPY --from=builder /app/back/dist ./dist
         RUN mkdir -p public
         EXPOSE 3001
-        CMD sh -c "npx prisma migrate deploy && node dist/main"
+        CMD sh -c "npx prisma migrate deploy && node dist/src/main"
     container_name: obedi-backend
     restart: unless-stopped
     environment:
