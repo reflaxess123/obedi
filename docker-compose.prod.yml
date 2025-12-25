@@ -42,7 +42,7 @@ services:
       - SUPABASE_SERVICE_KEY=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Imxremxhb2ZmYmxqc3ZxdmVkcnlxIiwicm9sZSI6InNlcnZpY2Vfcm9sZSIsImlhdCI6MTc2NjY2MTg5OCwiZXhwIjoyMDgyMjM3ODk4fQ.M6BS6EiuHigTg3ec36hIwzJPbNcJW1U8j8PVXRDSydE
       - SUPABASE_BUCKET=lunches
       - PORT=3001
-      - FRONTEND_URL=http://146.103.126.232
+      - FRONTEND_URL=http://asd-mono-xnm0rz-29763f-146-103-126-232.traefik.me
     ports:
       - "3001:3001"
     networks:
