@@ -47,7 +47,8 @@ function handleFileSelect(event: Event) {
 }
 
 function removeImage(index: number) {
-  URL.revokeObjectURL(pendingImages.value[index].preview)
+  const img = pendingImages.value[index]
+  if (img) URL.revokeObjectURL(img.preview)
   pendingImages.value.splice(index, 1)
 }
 

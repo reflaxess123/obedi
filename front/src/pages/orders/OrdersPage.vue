@@ -1,10 +1,7 @@
 <script setup lang="ts">
 import { ref, computed } from 'vue'
 import { useOrders, useUpdateOrderStatus } from '@shared/api'
-import { useSessionStore } from '@entities/session'
 import type { OrderStatus } from '@shared/types'
-
-const sessionStore = useSessionStore()
 const activeTab = ref<'incoming' | 'outgoing'>('incoming')
 
 const { data: incomingOrders, isLoading: loadingIncoming } = useOrders(

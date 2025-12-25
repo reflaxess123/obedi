@@ -38,7 +38,7 @@ const difficultyColors = {
       </div>
       <img
         v-else
-        :src="lunch.images[0].url"
+        :src="lunch.images[0]?.url"
         :alt="lunch.title"
         class="h-full w-full object-cover"
       />

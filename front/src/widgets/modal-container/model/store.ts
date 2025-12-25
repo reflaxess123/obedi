@@ -30,7 +30,7 @@ export const useModalStore = defineStore('modal', () => {
       const index = stack.value.findIndex((m) => m.id === id)
       if (index !== -1) {
         const modal = stack.value[index]
-        modal.onClose?.()
+        if (modal) modal.onClose?.()
         stack.value.splice(index, 1)
       }
     } else if (stack.value.length > 0) {
