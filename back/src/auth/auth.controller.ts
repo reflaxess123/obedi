@@ -4,10 +4,12 @@ import {
   Get,
   Body,
   Res,
+  Req,
   HttpCode,
   HttpStatus,
+  UnauthorizedException,
 } from '@nestjs/common';
-import type { Response } from 'express';
+import type { Response, Request } from 'express';
 import { ApiTags, ApiOperation, ApiBearerAuth } from '@nestjs/swagger';
 import { AuthService } from './auth.service';
 import { RegisterDto, LoginDto, GoogleAuthDto } from './dto/auth.dto';
@@ -53,8 +55,12 @@ export class AuthController {
   @Post('refresh')
   @HttpCode(HttpStatus.OK)
   @ApiOperation({ summary: 'Refresh access token' })
-  async refresh(@CurrentUser() user: User) {
-    return this.authService.refreshToken(user.id);
+  async refresh(@Req() req: Request) {
+    const refreshToken = req.cookies?.refreshToken;
+    if (!refreshToken) {
+      throw new UnauthorizedException('Refresh token not found');
+    }
+    return this.authService.refreshTokenFromCookie(refreshToken);
   }
 
   @Post('logout')

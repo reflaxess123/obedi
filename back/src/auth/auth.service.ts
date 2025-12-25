@@ -104,6 +104,28 @@ export class AuthService {
     return { accessToken: this.generateAccessToken(user) };
   }
 
+  async refreshTokenFromCookie(refreshToken: string) {
+    try {
+      const payload = this.jwtService.verify(refreshToken);
+
+      if (payload.type !== 'refresh') {
+        throw new UnauthorizedException('Invalid token type');
+      }
+
+      const user = await this.prisma.user.findUnique({
+        where: { id: payload.sub },
+      });
+
+      if (!user) {
+        throw new UnauthorizedException('User not found');
+      }
+
+      return { accessToken: this.generateAccessToken(user) };
+    } catch {
+      throw new UnauthorizedException('Invalid refresh token');
+    }
+  }
+
   async getMe(userId: number) {
     const user = await this.prisma.user.findUnique({
       where: { id: userId },
