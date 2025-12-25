@@ -1,0 +1,46 @@
+# Dependencies
+node_modules
+**/node_modules
+
+# Build outputs
+dist
+**/dist
+.next
+**/.next
+
+# IDE
+.idea
+.vscode
+*.swp
+*.swo
+
+# Git
+.git
+.gitignore
+
+# Logs
+*.log
+npm-debug.log*
+pnpm-debug.log*
+
+# Local env files (production env is copied separately)
+.env
+.env.local
+.env.development
+**/.env
+**/.env.local
+**/.env.development
+
+# Test
+coverage
+**/*.spec.ts
+**/*.test.ts
+
+# Misc
+.DS_Store
+Thumbs.db
+*.md
+!README.md
+
+# Claude
+.claude

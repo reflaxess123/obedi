@@ -1,0 +1,52 @@
+# Dependencies
+node_modules/
+.pnpm-store/
+
+# Build output
+dist/
+build/
+
+# Environment files
+.env
+.env.local
+.env.*.local
+.env.production
+**/.env
+**/.env.production
+**/.env.local
+
+# IDE
+.idea/
+.vscode/
+*.swp
+*.swo
+*~
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Logs
+*.log
+npm-debug.log*
+pnpm-debug.log*
+
+# Ruby/Rails
+back/tmp/
+back/log/
+back/storage/
+back/.bundle/
+back/vendor/bundle/
+
+# Docker volumes
+postgres_data/
+redis_data/
+
+# Claude
+.claude/
+
+# Input data (telegram exports, etc)
+In/
+
+# Uploads (stored in Supabase)
+**/public/uploads/

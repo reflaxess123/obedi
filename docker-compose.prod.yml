@@ -1,0 +1,32 @@
+version: '3.8'
+
+services:
+  backend:
+    build:
+      context: .
+      dockerfile: back/Dockerfile
+    container_name: obedi-backend
+    restart: unless-stopped
+    env_file:
+      - ./back/.env.production
+    ports:
+      - "3001:3001"
+    networks:
+      - obedi-network
+
+  frontend:
+    build:
+      context: .
+      dockerfile: front/Dockerfile
+    container_name: obedi-frontend
+    restart: unless-stopped
+    ports:
+      - "80:80"
+    networks:
+      - obedi-network
+    depends_on:
+      - backend
+
+networks:
+  obedi-network:
+    driver: bridge

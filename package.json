@@ -1,0 +1,18 @@
+{
+  "name": "obedi",
+  "version": "1.0.0",
+  "private": true,
+  "scripts": {
+    "dev": "pnpm --parallel run dev",
+    "dev:front": "pnpm --filter front dev",
+    "dev:back": "pnpm --filter back dev",
+    "build": "pnpm --filter front build",
+    "lint": "pnpm --parallel run lint",
+    "docker:up": "docker-compose up -d",
+    "docker:down": "docker-compose down"
+  },
+  "engines": {
+    "node": ">=18.0.0",
+    "pnpm": ">=8.0.0"
+  }
+}

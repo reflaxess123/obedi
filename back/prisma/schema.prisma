@@ -1,0 +1,124 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+enum AuthProvider {
+  EMAIL
+  GOOGLE
+}
+
+enum Difficulty {
+  EASY
+  MEDIUM
+  HARD
+}
+
+model User {
+  id           Int          @id @default(autoincrement())
+  email        String       @unique
+  passwordHash String?
+  name         String
+  avatarUrl    String?
+  provider     AuthProvider @default(EMAIL)
+  providerId   String?
+  createdAt    DateTime     @default(now())
+  updatedAt    DateTime     @updatedAt
+
+  lunches        Lunch[]
+  ordersAsCustomer Order[] @relation("CustomerOrders")
+  ordersAsChef     Order[] @relation("ChefOrders")
+
+  @@index([provider, providerId])
+}
+
+model Lunch {
+  id          Int         @id @default(autoincrement())
+  userId      Int
+  title       String
+  recipe      String?
+  calories    Int?
+  proteins    Float?
+  fats        Float?
+  carbs       Float?
+  cookingTime Int?
+  difficulty  Difficulty?
+  tags        String[]
+  createdAt   DateTime    @default(now())
+  updatedAt   DateTime    @updatedAt
+
+  user       User          @relation(fields: [userId], references: [id], onDelete: Cascade)
+  images     LunchImage[]
+  orderItems OrderItem[]
+
+  @@index([userId])
+}
+
+model LunchImage {
+  id       Int    @id @default(autoincrement())
+  lunchId  Int
+  url      String
+  key      String
+  width    Int?
+  height   Int?
+  position Int    @default(0)
+
+  lunch Lunch @relation(fields: [lunchId], references: [id], onDelete: Cascade)
+
+  @@index([lunchId])
+}
+
+enum OrderStatus {
+  PENDING
+  ACCEPTED
+  COOKING
+  READY
+  DELIVERED
+  CANCELLED
+}
+
+model Order {
+  id          Int         @id @default(autoincrement())
+  customerId  Int
+  chefId      Int
+  status      OrderStatus @default(PENDING)
+  comment     String?
+  createdAt   DateTime    @default(now())
+  updatedAt   DateTime    @updatedAt
+
+  customer User        @relation("CustomerOrders", fields: [customerId], references: [id], onDelete: Cascade)
+  chef     User        @relation("ChefOrders", fields: [chefId], references: [id], onDelete: Cascade)
+  items    OrderItem[]
+  history  OrderHistory[]
+
+  @@index([customerId])
+  @@index([chefId])
+  @@index([status])
+}
+
+model OrderItem {
+  id      Int @id @default(autoincrement())
+  orderId Int
+  lunchId Int
+
+  order Order @relation(fields: [orderId], references: [id], onDelete: Cascade)
+  lunch Lunch @relation(fields: [lunchId], references: [id], onDelete: Cascade)
+
+  @@index([orderId])
+}
+
+model OrderHistory {
+  id        Int         @id @default(autoincrement())
+  orderId   Int
+  status    OrderStatus
+  comment   String?
+  createdAt DateTime    @default(now())
+
+  order Order @relation(fields: [orderId], references: [id], onDelete: Cascade)
+
+  @@index([orderId])
+}
